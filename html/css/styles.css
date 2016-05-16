@@ -1,0 +1,44 @@
+body {
+	font-family: "Helvetica Neue";
+	color: #30292F;
+	background-color: #C4D7F2;
+}
+ul {
+	padding: 0;
+	list-style: none;
+}
+.letter-chooser {
+	width: 450px;
+}
+li {
+	display: inline;
+	margin: 2px;
+}
+button {
+	width: 30px;
+	height: 30px;
+	margin-top: 2px;
+	text-align: center;
+	border: 0;
+	border-radius: 5px;
+	background-color: #7180B9;
+	color: #C4D7F2;
+}
+button:hover {
+	cursor: pointer;
+	background-color: #684756;
+	color: #C4D7F2;
+}
+.penguin {
+	display: inline-block;
+	background-image: url('/images/penguin.svg');
+	background-repeat: no-repeat;
+	width: 100px;
+	height: 153px;
+}
+.whale {
+	background-image: url('/images/whale.svg');
+	background-repeat: no-repeat;
+	width: 546;
+	height: 280px;
+}
