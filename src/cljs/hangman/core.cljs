@@ -3,6 +3,7 @@
             [clojure.string :as string]
             [hangman.images :as images]))
 
+;; state and actions
 (defonce app-state
   (reagent/atom
    {:penguin-count 5
@@ -10,10 +11,20 @@
     :word "clojure"
     }))
 
-(defn guess-letter! [letter]
-  (apply swap! app-state update-in [:guessed-letters] conj letter))
-
+;; constant: a vector of lettes
 (def letters (string/split "abcdefghijklmnopqrstuwvxyz" ""))
+
+(defn word-contains? [letter]
+  (contains? (set (string/split (:word @app-state) "")) letter))
+
+(defn guess-letter! [letter]
+    (do
+      (apply swap! app-state update-in [:guessed-letters] conj letter)
+      (when (not (word-contains? letter))
+        (swap! app-state assoc-in [:penguin-count] (- (:penguin-count @app-state) 1)))))
+
+(defn game-won? [guessed-letters word]
+  (= (sort guessed-letters) (sort (string/split word ""))))
 
 ; TODO write this better
 (defn unguessed-letters [guessed-letters]
@@ -24,13 +35,13 @@
   [:button {:type "submit"
             :on-click (fn [e] (guess-letter! letter))} letter])
 
-(defn letter-chooser [letters]
+(defn letter-chooser [available-letters]
   [:ul {:class "letter-chooser"}
-    (for [letter letters]
+    (for [letter available-letters]
       ^{:key letter}
       [:li (letter-button letter)])])
 
-(defn word-display [word guessed-letters]
+(defn word-display [guessed-letters word]
   [:ul (for [l word]
     ^{:key l}
     [:li (if
@@ -38,16 +49,22 @@
       [:span l]
       [:span "_"])])])
 
+(defn victory-view []
+  [:section {:id "victory"}
+    [:h2 "🎉 You Win! 🎉"]])
+
 ;; full app
 (defn app []
   [:main
     [:h1 "Hangman (as penguins)"]
     [:section {:id "display"}
       (images/penguins (:penguin-count @app-state))
-      [images/whale]
-      [word-display (:word @app-state) (:guessed-letters @app-state)]]
-    [:section {:id "controls"}
-      [letter-chooser (unguessed-letters (:guessed-letters @app-state))]]])
+      [word-display (:guessed-letters @app-state) (:word @app-state)]]
+    (if (game-won? (:guessed-letters @app-state) (:word @app-state))
+      [victory-view]
+      [:section {:id "controls"}
+        [letter-chooser (unguessed-letters (:guessed-letters @app-state))]])
+    ])
 
 ;; render the app
 (reagent/render
