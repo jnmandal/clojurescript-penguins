@@ -9,11 +9,9 @@
 ;; state and actions
 (defonce app-state
   (reagent/atom
-    ; TODO remove penguin-count as state
-   {:penguin-count 5
-    :guessed-letters []
-    :word "clojure"
-    }))
+    ; TODO use set/list here
+    {:guessed-letters []
+    :word "clojure"}))
 
 (defn word-contains? [letter]
   (contains? (set (string/split (:word @app-state) "")) letter))
@@ -22,25 +20,32 @@
   (contains? (set (:guessed-letters @app-state)) letter))
 
 (defn guess-letter! [letter]
-    (do
-      (swap! app-state update-in [:guessed-letters] conj letter)
-      ; TODO remove penguin-count as state
-      (when (not (word-contains? letter))
-        (swap! app-state assoc-in [:penguin-count] (- (:penguin-count @app-state) 1)))))
+  (swap! app-state update-in [:guessed-letters] conj letter))
 
 (defn game-won? []
   (every? true?
     (map letter-guessed? (string/split (:word @app-state) ""))))
 
-; naive implementation
+; naive implementation example for demo
 ; (defn game-won? []
 ;   (=
 ;     (sort (:guessed-letters @app-state))
 ;     (sort (string/split (:word @app-state) ""))))
 
+(defn correct-guesses []
+  (filterv word-contains? (:guessed-letters @app-state)))
+
+(defn penguins-left []
+  (- guess-limit
+    (-
+      (count (:guessed-letters @app-state))
+      (count (correct-guesses)))))
+
 ; TODO write this better
 (defn unguessed-letters [guessed-letters]
-  (filterv (fn [letter] (not (contains? (set guessed-letters) letter))) letters))
+  (filterv
+    (fn [letter] (not (contains? (set guessed-letters) letter)))
+    letters))
 
 ;; components
 (defn letter-button [letter]
@@ -65,12 +70,11 @@
   [:section {:id "victory"}
     [:h2 "🎉 You Win! 🎉"]])
 
-;; full app
 (defn app []
   [:main
     [:h1 "Hangman (as penguins)"]
     [:section {:id "display"}
-      (images/penguins (:penguin-count @app-state))
+      [images/penguins (penguins-left)]
       [word-display (:guessed-letters @app-state) (:word @app-state)]]
     (if (game-won?)
       [victory-view]
