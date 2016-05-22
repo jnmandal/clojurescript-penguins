@@ -3,28 +3,40 @@
             [clojure.string :as string]
             [hangman.images :as images]))
 
+(defonce letters (string/split "abcdefghijklmnopqrstuwvxyz" ""))
+(defonce guess-limit 5)
+
 ;; state and actions
 (defonce app-state
   (reagent/atom
+    ; TODO remove penguin-count as state
    {:penguin-count 5
     :guessed-letters []
     :word "clojure"
     }))
 
-;; constant: a vector of lettes
-(def letters (string/split "abcdefghijklmnopqrstuwvxyz" ""))
-
 (defn word-contains? [letter]
   (contains? (set (string/split (:word @app-state) "")) letter))
 
+(defn letter-guessed? [letter]
+  (contains? (set (:guessed-letters @app-state)) letter))
+
 (defn guess-letter! [letter]
     (do
-      (apply swap! app-state update-in [:guessed-letters] conj letter)
+      (swap! app-state update-in [:guessed-letters] conj letter)
+      ; TODO remove penguin-count as state
       (when (not (word-contains? letter))
         (swap! app-state assoc-in [:penguin-count] (- (:penguin-count @app-state) 1)))))
 
-(defn game-won? [guessed-letters word]
-  (= (sort guessed-letters) (sort (string/split word ""))))
+(defn game-won? []
+  (every? true?
+    (map letter-guessed? (string/split (:word @app-state) ""))))
+
+; naive implementation
+; (defn game-won? []
+;   (=
+;     (sort (:guessed-letters @app-state))
+;     (sort (string/split (:word @app-state) ""))))
 
 ; TODO write this better
 (defn unguessed-letters [guessed-letters]
@@ -60,7 +72,7 @@
     [:section {:id "display"}
       (images/penguins (:penguin-count @app-state))
       [word-display (:guessed-letters @app-state) (:word @app-state)]]
-    (if (game-won? (:guessed-letters @app-state) (:word @app-state))
+    (if (game-won?)
       [victory-view]
       [:section {:id "controls"}
         [letter-chooser (unguessed-letters (:guessed-letters @app-state))]])
