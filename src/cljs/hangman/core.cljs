@@ -26,7 +26,7 @@
   (every? true?
     (map letter-guessed? (string/split (:word @app-state) ""))))
 
-; naive implementation example for demo
+;; naive implementation example for demo
 ; (defn game-won? []
 ;   (=
 ;     (sort (:guessed-letters @app-state))
@@ -41,30 +41,25 @@
       (count (:guessed-letters @app-state))
       (count (correct-guesses)))))
 
-; TODO write this better
-(defn unguessed-letters [guessed-letters]
-  (filterv
-    (fn [letter] (not (contains? (set guessed-letters) letter)))
-    letters))
-
 ;; components
 (defn letter-button [letter]
   [:button {:type "submit"
             :on-click (fn [e] (guess-letter! letter))} letter])
 
-(defn letter-chooser [available-letters]
+(defn letter-chooser [guessed-letters letters]
   [:ul {:class "letter-chooser"}
-    (for [letter available-letters]
-      ^{:key letter}
-      [:li (letter-button letter)])])
+    (doall (for [letter letters]
+      (when (not (letter-guessed? letter))
+        ^{:key letter}
+        [:li (letter-button letter)])))])
 
 (defn word-display [guessed-letters word]
-  [:ul (for [l word]
-    ^{:key l}
-    [:li (if
-      (contains? (set guessed-letters) l)
-      [:span l]
-      [:span "_"])])])
+  [:ul
+    (doall (for [letter word]
+      ^{:key letter}
+      [:li (if (letter-guessed? letter)
+        [:span letter]
+        [:span "_"])]))])
 
 (defn victory-view []
   [:section {:id "victory"}
@@ -79,8 +74,7 @@
     (if (game-won?)
       [victory-view]
       [:section {:id "controls"}
-        [letter-chooser (unguessed-letters (:guessed-letters @app-state))]])
-    ])
+        [letter-chooser (:guessed-letters @app-state) letters]])])
 
 ;; render the app
 (reagent/render
