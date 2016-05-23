@@ -3,21 +3,20 @@
             [clojure.string :as string]
             [hangman.display :as display]))
 
-(defonce letters (string/split "abcdefghijklmnopqrstuwvxyz" ""))
+(defonce letters (sort (set "abcdefghijklmnopqrstuwvxyz")))
 (defonce guess-limit 5)
 
 ;; state and actions
 (defonce app-state
   (reagent/atom
-    ; TODO use set/list here
-    {:guessed-letters []
-    :word "clojure"}))
+    {:guessed-letters #{}
+     :word "clojure"}))
 
 (defn word-contains? [letter]
   (contains? (set (string/split (:word @app-state) "")) letter))
 
 (defn letter-guessed? [letter]
-  (contains? (set (:guessed-letters @app-state)) letter))
+  (contains? (:guessed-letters @app-state) letter))
 
 (defn guess-letter! [letter]
   (swap! app-state update-in [:guessed-letters] conj letter))
@@ -54,12 +53,11 @@
         [:li (letter-button letter)])))])
 
 (defn word [guessed-letters word]
-  [:ul
-    (doall (for [letter word]
-      ^{:key letter}
-      [:li (if (letter-guessed? letter)
-        [:span letter]
-        [:span "_"])]))])
+  [:ul (map (fn [letter]
+    ^{:key letter}
+    [:li (if (letter-guessed? letter)
+      [:span letter]
+      [:span "_"])]) (string/split word ""))])
 
 (defn victory-view []
   [:section {:id "victory"}
