@@ -1,7 +1,7 @@
 (ns hangman.core
   (:require [reagent.core :as reagent]
             [clojure.string :as string]
-            [hangman.images :as images]))
+            [hangman.display :as display]))
 
 (defonce letters (string/split "abcdefghijklmnopqrstuwvxyz" ""))
 (defonce guess-limit 5)
@@ -53,7 +53,7 @@
         ^{:key letter}
         [:li (letter-button letter)])))])
 
-(defn word-display [guessed-letters word]
+(defn word [guessed-letters word]
   [:ul
     (doall (for [letter word]
       ^{:key letter}
@@ -69,8 +69,8 @@
   [:main
     [:h1 "Hangman (as penguins)"]
     [:section {:id "display"}
-      [images/penguins (penguins-left)]
-      [word-display (:guessed-letters @app-state) (:word @app-state)]]
+      [display/scoreboard (penguins-left)]
+      [word (:guessed-letters @app-state) (:word @app-state)]]
     (if (game-won?)
       [victory-view]
       [:section {:id "controls"}

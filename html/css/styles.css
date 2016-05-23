@@ -3,12 +3,14 @@ body {
 	color: #30292F;
 	background-color: #C4D7F2;
 }
+main {
+	margin: 0 auto;
+	max-width: 445px;
+	text-align: center;
+}
 ul {
 	padding: 0;
 	list-style: none;
-}
-.letter-chooser {
-	width: 450px;
 }
 li {
 	display: inline;
@@ -33,12 +35,18 @@ button:hover {
 	display: inline-block;
 	background-image: url('/images/penguin.svg');
 	background-repeat: no-repeat;
-	width: 100px;
-	height: 153px;
+	width: 75px;
+	height: 100%;
+	margin-top: 100px;
+}
+.penguins {
+	height: 250px;
+	margin: 0 auto;
+	overflow: hidden;
 }
 .whale {
 	background-image: url('/images/whale.svg');
 	background-repeat: no-repeat;
-	width: 546;
-	height: 280px;
+	width: auto;
+	height: 250px;
 }
