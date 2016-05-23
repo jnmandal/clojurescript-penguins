@@ -14,7 +14,21 @@
 (defn whale []
   [:div {:class "whale"}])
 
+(defn play-whale-sound []
+  (.play (new js/Audio
+    (rand-nth '("/sounds/orca1.mp3" "/sounds/orca2.mp3")))))
+
 (defn scoreboard [penguin-count]
-  (if (> penguin-count 0)
-    [penguins penguin-count]
-    [whale]))
+  (let [animation (reagent/atom false)]
+    (reagent/create-class
+      {:component-will-receive-props
+        (fn []
+          (do
+            (reset! animation true)
+            (play-whale-sound)
+            (js/setTimeout #(reset! animation false) 1000)))
+       :reagent-render
+          (fn [penguin-count]
+            (if (or (= penguin-count 0) @animation)
+              [whale]
+              [penguins penguin-count]))})))

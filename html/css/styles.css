@@ -44,9 +44,20 @@ button:hover {
 	margin: 0 auto;
 	overflow: hidden;
 }
+@keyframes whale-attack {
+	0% {
+		transform: translateX(150%);
+	}
+	100% {
+		transform: translateX(0%);
+	}
+}
 .whale {
 	background-image: url('/images/whale.svg');
 	background-repeat: no-repeat;
 	width: auto;
 	height: 250px;
+	animation-name: whale-attack;
+	animation-duration: 0.25s;
+	animation-timing-function: ease-in-out;
 }
