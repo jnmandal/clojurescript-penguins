@@ -74,7 +74,9 @@
       [:section {:id "controls"}
         [letter-chooser (:guessed-letters @app-state) letters]])])
 
-;; render the app
-(reagent/render
-  [app]
-  (.getElementById js/document "cljs-target"))
+(defn init! []
+  (reagent/render
+    [app]
+    (.getElementById js/document "cljs-target")))
+
+(set! (.-onload js/window) init!)
